@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt')
 // Swapped Regex for the 'validator' package to enforce production-ready email verification
 // and to experiment and learning new things 
 const userSchema = new mongoose.Schema({
@@ -36,4 +38,14 @@ const userSchema = new mongoose.Schema({
 })
 
 const User = mongoose.model('User',userSchema); //User automatically becomes user lowercased by mongodb /mongoose
+
+//hashing password with 10 salt rounds
+userSchema.pre("save" , function(){
+    return this.password = bcrypt.hashSync(this.password , 10)
+})
+
+userSchema.methods.comparePassword = function(password) {
+    return bcrypt.compareSync(password , this.password)
+}
+
 module.exports = User;
