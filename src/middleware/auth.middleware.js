@@ -1,6 +1,6 @@
 const  jwt = require('jsonwebtoken');
 const UserModel = require('../model/user.model');
-const authmiddleware = async(req , res , next) => {
+const authMiddleware = async(req , res , next) => {
     try {
         const token = req.cookies.accessToken;
 
@@ -10,14 +10,15 @@ const authmiddleware = async(req , res , next) => {
         success:false
 })
     const decoded = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET)
-    const User = UserModel.findById(decoded.id) 
+    const user = await UserModel.findById(decoded.id);
      
     if(!user) {
       return res.status(401).json({
         success: false,
         message: "User account no longer exists in the system",
       });
-    }  req.user = user; // Share user profile data with any subsequent controller methods
+    }
+    req.user = user; // Share user profile data with any subsequent controller methods
     next(); // Security checks pass cleanly! Proceed to the next controller route task.
     
   } catch (error) {
