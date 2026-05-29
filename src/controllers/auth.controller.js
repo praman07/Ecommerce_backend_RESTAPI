@@ -1,11 +1,11 @@
-const User  = require('../model/user.model');
+const UserModel  = require('../model/user.model');
 const registerController = async (req , res) => {
     try {
         const {name , email ,mobile, password  } = req.body;
  if (!email || !password ||!mobile ||!name){
       return res.status(400).json({ success: false, message: "All fields are required" });}
 
-        const isExist = await User.findOne({email});
+        const isExist = await UserModel.findOne({email});
         if(isExist){
             
             return res.status(400).json({
@@ -15,7 +15,7 @@ const registerController = async (req , res) => {
             })
         }
 
-        const newUser = await User.create({name , email , mobile , password});
+        const newUser = await UserModel.create({name , email , mobile , password});
         const accessToken = newUser.generateAccessToken();
         const refreshToken = newUser.generateRefreshToken();
         
@@ -48,7 +48,7 @@ const loginController = async (req, res) => {
          if (!email || !password){
       return res.status(400).json({ success: false, message: "All fields are required" });}
 
-        const isExisted = await User.findOne({email}).select('+password') // beacause we did select:false in schema specifically on password ;
+        const isExisted = await UserModel.findOne({email}).select('+password') // beacause we did select:false in schema specifically on password ;
         if(!isExisted){
             return res.status(404).json({
                 message:"User with this email does not exist",

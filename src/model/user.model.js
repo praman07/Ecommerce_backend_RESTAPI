@@ -57,5 +57,5 @@ userSchema.methods.generateRefreshToken = function () {
     return jwt.sign({id:this._id}, process.env.REFRESH_TOKEN_SECRET , {expiresIn:"7d"});
 }
 
-const User = mongoose.model('User',userSchema); //User automatically becomes user lowercased by mongodb /mongoose
-module.exports = User;
+const UserModel = mongoose.model('User',userSchema); //User automatically becomes user lowercased by mongodb /mongoose
+module.exports = UserModel;
