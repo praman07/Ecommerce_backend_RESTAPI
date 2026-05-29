@@ -37,7 +37,6 @@ const userSchema = new mongoose.Schema({
   }
 })
 
-const User = mongoose.model('User',userSchema); //User automatically becomes user lowercased by mongodb /mongoose
 
 //hashing password with 10 salt rounds
 userSchema.pre("save" , function(){
@@ -48,4 +47,13 @@ userSchema.methods.comparePassword = function(password) {
     return bcrypt.compareSync(password , this.password)
 }
 
+userSchema.methods.generateAccessToken = function (){
+    return jwt.sign({id:this._id} , process.env.ACCESS_TOKEN_SECRET , {expiresIn:"15m"});
+}
+
+userSchema.methods.generateRefreshToken = function () {
+    return jwt.sign({id:this._id}, process.env.REFRESH_TOKEN_SECRET , {expiresIn:"7d"});
+}
+
+const User = mongoose.model('User',userSchema); //User automatically becomes user lowercased by mongodb /mongoose
 module.exports = User;
