@@ -12,6 +12,21 @@ const getAllProducts = async (req, res) => {
       filter.category = req.query.category.trim().toLowerCase();
     }
 
+    // Search by name or description
+    if (req.query.search) {
+      filter.$or = [
+        { name: { $regex: req.query.search, $options: 'i' } },
+        { description: { $regex: req.query.search, $options: 'i' } }
+      ];
+    }
+
+    // Price filtering
+    if (req.query.minPrice || req.query.maxPrice) {
+      filter.price = {};
+      if (req.query.minPrice) filter.price.$gte = Number(req.query.minPrice);
+      if (req.query.maxPrice) filter.price.$lte = Number(req.query.maxPrice);
+    }
+
     const products = await Product.find(filter);
     
     return res.status(200).json({
