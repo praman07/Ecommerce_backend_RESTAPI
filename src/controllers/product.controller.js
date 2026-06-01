@@ -27,11 +27,30 @@ const getAllProducts = async (req, res) => {
       if (req.query.maxPrice) filter.price.$lte = Number(req.query.maxPrice);
     }
 
-    const products = await Product.find(filter);
+    // Sorting
+    let sortOption = { createdAt: -1 }; // default sort by newest
+    if (req.query.sort) {
+      if (req.query.sort === 'price_asc') sortOption = { price: 1 };
+      else if (req.query.sort === 'price_desc') sortOption = { price: -1 };
+    }
+
+    // Pagination
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const skip = (page - 1) * limit;
+
+    const total = await Product.countDocuments(filter);
+    const products = await Product.find(filter)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit);
     
     return res.status(200).json({
       success: true,
       count: products.length,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
       products
     });
   } catch (error) {
