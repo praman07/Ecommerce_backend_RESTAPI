@@ -26,6 +26,10 @@ const productSchema = new mongoose.Schema({
     images:{
         type:[String],
         default:[]
+    },
+    isActive: {
+        type: Boolean,
+        default: true
     }
 
 },

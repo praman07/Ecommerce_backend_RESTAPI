@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 // Fetch all products with optional category filtering
 const getAllProducts = async (req, res) => {
   try {
-    const filter = {};
+    const filter = { isActive: true }; // Only fetch active products
     
     // Category filtering support (case-insensitive conversion to match model lowercase configuration)
     if (req.query.category) {
@@ -214,7 +214,13 @@ const deleteProduct = async (req, res) => {
       });
     }
 
-    const deletedProduct = await Product.findByIdAndDelete(id);
+    // Soft delete by setting isActive to false
+    const deletedProduct = await Product.findByIdAndUpdate(
+      id,
+      { isActive: false },
+      { new: true }
+    );
+    
     if (!deletedProduct) {
       return res.status(404).json({
         success: false,
@@ -224,7 +230,7 @@ const deleteProduct = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Product deleted successfully",
+      message: "Product soft-deleted successfully",
       product: deletedProduct
     });
   } catch (error) {
