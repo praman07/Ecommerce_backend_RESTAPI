@@ -5,7 +5,8 @@ const {
   getProductById,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  addReview
 } = require('../controllers/product.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 const { validateProduct } = require('../middleware/product.validator');
@@ -27,5 +28,8 @@ router.put('/products/:id', authMiddleware, upload.array('images', 5), validateP
 
 // DELETE /products/:id - Delete a product by ID
 router.delete('/products/:id', authMiddleware, deleteProduct);
+
+// POST /products/:id/reviews - Add a review to a product
+router.post('/products/:id/reviews', authMiddleware, addReview);
 
 module.exports = router;

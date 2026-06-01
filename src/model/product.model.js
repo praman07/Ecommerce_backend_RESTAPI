@@ -30,6 +30,29 @@ const productSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    ratings: [
+        {
+            userId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+                required: true
+            },
+            rating: {
+                type: Number,
+                required: true,
+                min: 1,
+                max: 5
+            },
+            comment: {
+                type: String,
+                required: true
+            }
+        }
+    ],
+    averageRating: {
+        type: Number,
+        default: 0
     }
 
 },

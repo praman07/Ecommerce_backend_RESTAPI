@@ -242,10 +242,74 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+// POST /products/:id/reviews
+// Add a review and rating to a product
+const addReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rating, comment } = req.body;
+
+    // Validate if the ID is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Product ID format"
+      });
+    }
+
+    const product = await Product.findById(id);
+    if (!product || !product.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found or inactive"
+      });
+    }
+
+    // Check if the user has already reviewed the product
+    const alreadyReviewed = product.ratings.find(
+      (r) => r.userId.toString() === req.user._id.toString()
+    );
+
+    if (alreadyReviewed) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already reviewed this product"
+      });
+    }
+
+    const review = {
+      userId: req.user._id,
+      rating: Number(rating),
+      comment
+    };
+
+    product.ratings.push(review);
+
+    // Calculate new average rating
+    const sum = product.ratings.reduce((acc, item) => acc + item.rating, 0);
+    product.averageRating = sum / product.ratings.length;
+
+    await product.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "Review added successfully",
+      product
+    });
+  } catch (error) {
+    console.error("Error in addReview:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error adding review"
+    });
+  }
+};
+
 module.exports = {
   getAllProducts,
   getProductById,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  addReview
 };
