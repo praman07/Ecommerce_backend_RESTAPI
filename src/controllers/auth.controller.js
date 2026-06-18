@@ -1,4 +1,7 @@
 const UserModel  = require('../model/user.model');
+
+
+// user register controller
 const registerController = async (req , res) => {
     try {
         const {name , email ,mobile, password  } = req.body;
@@ -42,6 +45,8 @@ const registerController = async (req , res) => {
         )
     }
 }
+
+// login controller
 const loginController = async (req, res) => {
     try {
         const {email , password} = req.body;
