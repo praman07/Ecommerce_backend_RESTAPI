@@ -62,8 +62,6 @@ Create a `.env` file in the root directory and add the following keys:
 ```env
 PORT=3000
 MONGODB_URL=mongodb://localhost:27017/cluster_ecommerce
-MONGODB_URI=mongodb://localhost:27017/cluster_ecommerce
-JWT_SECRET=herryqv25792v5hbj235iafu230452dfhw3dsfhe
 ACCESS_TOKEN_SECRET=herryqv25792v5hbj235iafu230452dfhw3dsfhe
 REFRESH_TOKEN_SECRET=asigep2367tgahpewuj3q48yvweugtn35445hg
 ```

@@ -41,9 +41,12 @@ const userSchema = new mongoose.Schema({
 
 
 //hashing password with 10 salt rounds
-userSchema.pre("save" , function(){
-    return this.password = bcrypt.hashSync(this.password , 10)
-})
+// Hash the password whenever it is first set or later changed.
+userSchema.pre("save", function () {
+  if (!this.isModified("password")) return;
+
+  this.password = bcrypt.hashSync(this.password, 10);
+});
 
 userSchema.methods.comparePassword = function(password) {
     return bcrypt.compareSync(password , this.password)
