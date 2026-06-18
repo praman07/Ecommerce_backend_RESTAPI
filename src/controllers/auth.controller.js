@@ -1,4 +1,5 @@
 const UserModel  = require('../model/user.model');
+const validator = require('validator');
 
 
 // user register controller
@@ -7,6 +8,13 @@ const registerController = async (req , res) => {
         const {name , email ,mobile, password  } = req.body;
  if (!email || !password ||!mobile ||!name){
       return res.status(400).json({ success: false, message: "All fields are required" });}
+
+        if (!validator.isMobilePhone(mobile, "any", { strictMode: true })) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide a valid international phone number"
+            });
+        }
 
         const isExist = await UserModel.findOne({email});
         if(isExist){
