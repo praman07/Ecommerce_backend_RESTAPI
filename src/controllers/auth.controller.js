@@ -1,5 +1,6 @@
 const UserModel  = require('../model/user.model');
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
 
 
 // user register controller
@@ -97,4 +98,58 @@ const refreshToken = isExisted.generateRefreshToken();
     }
 }
 
-module.exports = { registerController , loginController};
+// logout controller
+const logoutController = (req, res) => {
+    res.clearCookie("accessToken", { httpOnly: true });
+    res.clearCookie("refreshToken", { httpOnly: true });
+
+    return res.status(200).json({
+        message: "User logged out successfully",
+        success: true
+    });
+}
+
+// refresh token controller
+const refreshTokenController = async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+
+        if (!refreshToken) {
+            return res.status(401).json({
+                message: "Refresh token not found, please log in again",
+                success: false
+            });
+        }
+
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const user = await UserModel.findById(decoded.id);
+
+        if (!user) {
+            return res.status(401).json({
+                message: "User account no longer exists",
+                success: false
+            });
+        }
+
+        const newAccessToken = user.generateAccessToken();
+
+        res.cookie("accessToken", newAccessToken, {
+            httpOnly: true,
+            maxAge: 15 * 60 * 1000
+        });
+
+        return res.status(200).json({
+            message: "Access token refreshed successfully",
+            success: true
+        });
+    } catch (error) {
+        console.error("Error in refresh token:", error.message);
+
+        return res.status(401).json({
+            message: "Invalid or expired refresh token, please log in again",
+            success: false
+        });
+    }
+}
+
+module.exports = { registerController , loginController, logoutController, refreshTokenController };
